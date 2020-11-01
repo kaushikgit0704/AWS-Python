@@ -1,0 +1,45 @@
+AWSTemplateFormatVersion: 2010-09-09
+Metadata:
+  'AWS::CloudFormation::Designer':
+    27289b65-77c8-4034-bd39-01ea584c3e87:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 42
+        'y': 29
+      z: 0
+      embeds: []
+    72e33a30-0309-412b-8ada-d0a3cc9b65c3:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 190
+        'y': 30
+      z: 0
+Resources:
+  InputQueue:
+    Type: 'AWS::SQS::Queue'
+    Properties:
+      QueueName: DemoInput
+      MessageRetentionPeriod: 60
+      VisibilityTimeout: 30
+      RedrivePolicy:
+        deadLetterTargetArn:
+          'Fn::GetAtt':
+            - ReceiverDeadLetterQueue
+            - Arn
+        maxReceiveCount: 1
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 27289b65-77c8-4034-bd39-01ea584c3e87
+  LambdaFunctionEventSourceMapping:
+    Type: 'AWS::Lambda::EventSourceMapping'
+    Properties:
+      Enabled: true
+      EventSourceArn: !GetAtt InputQueue.Arn
+      FunctionName: !GetAtt LambdaFunction.Arn
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 72e33a30-0309-412b-8ada-d0a3cc9b65c3
